@@ -28,9 +28,7 @@ def display_list(cursor):
 # adding website, username and password to db
 def add_new_element_in_list(website: str, username: str, password: str, cursor):
 
-    # TODO: add the element in db
-    elements = [(website, username, password)]
-    cursor.executemany('INSERT INTO passwords(website, username, password) VALUES(?,?,?)', elements)
+    cursor.execute('INSERT INTO passwords(website, username, password) VALUES(?,?,?)', (website, username, password,))
 
     print('The username: "', username, '" with the password: "', password, '" has been added to the website:', website)
 

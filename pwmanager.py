@@ -42,11 +42,11 @@ def get_username_and_password(website: str, cursor):
 
 
 # remove username and password based on the input website
-def remove_username_and_password(website: str):
+def remove_username_and_password(website: str, cursor):
 
-    # TODO: remove from db the elements
+    cursor.execute('DELETE FROM passwords WHERE website=?', (website,))
 
-    print('Your username and password for the website:', website, 'has been removed')
+    print('Your usernames and passwords for the website:', website, 'has been removed')
 
 # closing the connection with the db
 def close_db_connection(conn):
@@ -78,7 +78,7 @@ def main():
             return 1
 
         elif arguments[1] == '-remove':
-            remove_username_and_password(arguments[2])
+            remove_username_and_password(arguments[2], cursor)
             close_db_connection(conn)
             return 1
 

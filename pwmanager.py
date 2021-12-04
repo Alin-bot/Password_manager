@@ -36,11 +36,9 @@ def add_new_element_in_list(website: str, username: str, password: str, cursor):
 
 
 # get username and password based on the input website
-def get_username_and_password(website: str):
-
-    # TODO: search in db and print elements
-
-    print('This is your username: - and this is your password: -')
+def get_username_and_password(website: str, cursor):
+    for row in cursor.execute('SELECT * FROM passwords WHERE website = ?', (website,)):
+        print(row)
 
 
 # remove username and password based on the input website
@@ -75,7 +73,7 @@ def main():
 
     elif len(arguments) == 3: # get or remove password option
         if arguments[1] == '-get':
-            get_username_and_password(arguments[2])
+            get_username_and_password(arguments[2], cursor)
             close_db_connection(conn)
             return 1
 

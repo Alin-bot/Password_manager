@@ -1,6 +1,9 @@
-import sys
-import sqlite3
+import sys # for comand line arguments
+import sqlite3 # for db
+import cryptocode # for encrypting
 
+
+real_master_password = 'master' # the master password
 
 # get the arguments from the command line
 def get_arguments() -> list:
@@ -9,10 +12,6 @@ def get_arguments() -> list:
 
 # verify if the master password from command line if correct
 def verify_master_password(master_password: str):
-
-    # TODO: get the master password
-    real_master_password = 'master'
-
     if not master_password == real_master_password:
         print('Wrong master password! Please try again.')
         return False
@@ -22,13 +21,15 @@ def verify_master_password(master_password: str):
 # display list of websites, usernames and password
 def display_list(cursor):
     for row in cursor.execute('SELECT * FROM passwords'):
-        print(row)
+        decrypted = cryptocode.decrypt(row[3], real_master_password) # decrypting password
+        print('website: ' + row[1] + '\t\tusername: ' + row[2] + '\t\tpassword: ' + decrypted)
 
 
 # adding website, username and password to db
 def add_new_element_in_list(website: str, username: str, password: str, cursor):
+    encoded = cryptocode.encrypt(password, real_master_password) # encrypting password
 
-    cursor.execute('INSERT INTO passwords(website, username, password) VALUES(?,?,?)', (website, username, password,))
+    cursor.execute('INSERT INTO passwords(website, username, password) VALUES(?,?,?)', (website, username, encoded,))
 
     print('The username: "', username, '" with the password: "', password, '" has been added to the website:', website)
 
@@ -36,7 +37,8 @@ def add_new_element_in_list(website: str, username: str, password: str, cursor):
 # get username and password based on the input website
 def get_username_and_password(website: str, cursor):
     for row in cursor.execute('SELECT * FROM passwords WHERE website = ?', (website,)):
-        print(row)
+        decrypted = cryptocode.decrypt(row[3], real_master_password) # decrypting password
+        print('website: ' + row[1] + '\t\tusername: ' + row[2] + '\t\tpassword: ' + decrypted)
 
 
 # remove username and password based on the input website
@@ -44,7 +46,7 @@ def remove_username_and_password(website: str, cursor):
 
     cursor.execute('DELETE FROM passwords WHERE website=?', (website,))
 
-    print('Your usernames and passwords for the website:', website, 'has been removed')
+    print('Your usernames and passwords for the website:', website, 'have been removed')
 
 # closing the connection with the db
 def close_db_connection(conn):
@@ -53,6 +55,10 @@ def close_db_connection(conn):
 
 def main():
     arguments = get_arguments()
+
+    if len(arguments) == 0:
+        print('Give arguments to command!')
+        return 0
 
     if not verify_master_password(arguments[0]):
         return 0

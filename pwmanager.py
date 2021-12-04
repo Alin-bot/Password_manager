@@ -1,4 +1,5 @@
 import sys
+import sqlite3
 
 
 # get the arguments from the command line
@@ -49,30 +50,44 @@ def remove_username_and_password(website: str):
 
     print('Your username and password for the website:', website, 'has been removed')
 
+# closing the connection with the db
+def close_db_connection(conn):
+    conn.commit()
+    conn.close
 
 def main():
     arguments = get_arguments()
 
     if not verify_master_password(arguments[0]):
         return 0
+   
+    conn = sqlite3.connect('pwmanager.db') # connecting to the data base or creating if not exists
+    cursor = conn.cursor() # create cursor to execute queries
+
+    # creating the table if not exists
+    cursor.execute('''CREATE TABLE IF NOT EXISTS passwords(id INTEGER PRIMARY KEY, website TEXT, username TEXT, password TEXT)''')
 
     if len(arguments) == 5: # adding new password option
         if arguments[1] == '-add':
             add_new_element_in_list(arguments[2], arguments[3], arguments[4])
+            close_db_connection(conn)
             return 1
 
     elif len(arguments) == 3: # get or remove password option
         if arguments[1] == '-get':
             get_username_and_password(arguments[2])
+            close_db_connection(conn)
             return 1
 
         elif arguments[1] == '-remove':
             remove_username_and_password(arguments[2])
+            close_db_connection(conn)
             return 1
 
     elif len(arguments) == 2: # list passwords option
         if arguments[1] == '-list':
             display_list()
+            close_db_connection(conn)
             return 1
 
     print('Wrong command! Please try again.')

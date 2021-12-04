@@ -20,11 +20,9 @@ def verify_master_password(master_password: str):
 
 
 # display list of websites, usernames and password
-def display_list():
-
-    # TODO: list the db
-    
-    print('This is the list: ')
+def display_list(cursor):
+    for row in cursor.execute('SELECT * FROM passwords'):
+        print(row)
 
 
 # adding website, username and password to db
@@ -88,7 +86,7 @@ def main():
 
     elif len(arguments) == 2: # list passwords option
         if arguments[1] == '-list':
-            display_list()
+            display_list(cursor)
             close_db_connection(conn)
             return 1
 

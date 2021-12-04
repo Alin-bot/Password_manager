@@ -28,9 +28,11 @@ def display_list():
 
 
 # adding website, username and password to db
-def add_new_element_in_list(website: str, username: str, password: str):
+def add_new_element_in_list(website: str, username: str, password: str, cursor):
 
     # TODO: add the element in db
+    elements = [(website, username, password)]
+    cursor.executemany('INSERT INTO passwords(website, username, password) VALUES(?,?,?)', elements)
 
     print('The username: "', username, '" with the password: "', password, '" has been added to the website:', website)
 
@@ -69,7 +71,7 @@ def main():
 
     if len(arguments) == 5: # adding new password option
         if arguments[1] == '-add':
-            add_new_element_in_list(arguments[2], arguments[3], arguments[4])
+            add_new_element_in_list(arguments[2], arguments[3], arguments[4], cursor)
             close_db_connection(conn)
             return 1
 
